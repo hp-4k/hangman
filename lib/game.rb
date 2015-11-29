@@ -3,6 +3,10 @@ class Game
   DICTIONARY_FILE = "5desk.txt"
   CHANCES = 10
 
+  def self.savefile
+    "savefile.yaml"
+  end
+
   def initialize
     @secret_word = nil
     @guessed_letters = []
@@ -10,11 +14,15 @@ class Game
     @lives_left = 0
   end
 
-  def play
+  def start
     select_word
     prepare_game
+    play
+  end
+
+  def play
     until game_over?
-      process_guess(obtain_guess)
+      obtain_guess
     end
     end_game_message
   end
@@ -59,15 +67,21 @@ class Game
     def obtain_guess
       puts ''
       puts "You have #{@lives_left} lives left."
+      puts "Type 'SAVE' to save the game"
       puts "Guesses you have tried: #{@guesses.join(' ')}"
       provide_feedback
       puts "Please guess a character (only the first character will be read):"
-      gets.chomp[0]
+      input = gets.chomp
+      if input.downcase == 'save'
+        save_game
+      else
+        process_guess(input[0])
+      end
     end
 
     def process_guess(character)
       raise ArgumentError "more than 1 character supplied" if character.length != 1
-      @guesses << character
+      @guesses << character.downcase
       good_guess = false
       @secret_word.split('').each_with_index do |secret_character, index|
         if character.downcase == secret_character.downcase
@@ -89,5 +103,12 @@ class Game
         puts "Sorry, you have run out of chances!"
         puts "The secret word was '#{@secret_word}'"
       end
+    end
+
+    def save_game
+      File.open(Game.savefile, "w") do |file|
+        file.write(YAML.dump(self))
+      end
+      puts "\nGame saved!\n"
     end
 end

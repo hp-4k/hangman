@@ -1,0 +1,13 @@
+--- !ruby/object:Game
+secret_word: grader
+guessed_letters:
+- _
+- _
+- _
+- _
+- e
+- _
+guesses:
+- e
+- t
+lives_left: 9
